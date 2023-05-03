@@ -8,6 +8,8 @@ urlpatterns = [
          ProductViewSet.as_view({'get': 'get_category_products'}), name='list of category products'),
     path('categories/<int:category_id>/subcategories/',
          SubCategoryViewSet.as_view({'get': 'get_subcategories_of_category'})),
+    path('categories/<int:category_id>/subcategories/<int:subcat_id>/',
+         SubCategoryViewSet.as_view({'get': 'get_subcategory_of_category'}), name='single subcategory'),
     path('categories/<int:category_id>/subcategories/<int:subcat_id>/products/',
          ProductViewSet.as_view({'get': 'get_subcategory_products'})),
     path('products/rating/<int:min>/',

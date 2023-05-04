@@ -10,12 +10,7 @@ urlpatterns = [
          WarehouseViewSet.as_view({'get': 'get_warehouse_items_of_shop'}),
          name='get warehouse items from shop'),
     path('shops/<int:shop_id>/put_rating/<int:new_rating>/',
-<<<<<<< HEAD
          ShopViewSet.as_view({'get': 'put_rating_to_shop'}), name='rate shop')
-=======
-         ShopViewSet.as_view({'get': 'put_rating_to_shop'}), name='rate shop'),
-
->>>>>>> 2d527695d50cc5993ae2dcaf695b9088df2dd35b
 ]
 
 r = routers.DefaultRouter()

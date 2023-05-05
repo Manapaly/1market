@@ -8,8 +8,7 @@ urlpatterns = [
          ProductViewSet.as_view({'get': 'get_category_products'}), name='list of category products'),
     path('categories/<int:category_id>/subcategories/',
          SubCategoryViewSet.as_view({'get': 'get_subcategories_of_category'})),
-    path('categories/<int:category_id>/subcategories/<int:subcat_id>/products/',
-         ProductViewSet.as_view({'get': 'get_subcategory_products'})),
+
     path('products/rating/<int:min>/',
          ProductViewSet.as_view({'get': 'get_products_min_rating'}), name='products with minimum rate'),
     path('products/<int:product_id>/put_rating/<int:new_rating>/',
@@ -22,8 +21,29 @@ urlpatterns = [
     path('products/name/',
          ProductViewSet.as_view({'post': 'search_by_name'}), name='search product by name'),
 
+
+
+
+    # searching
     path('products/searching/<str:query>/',
          ProductViewSet.as_view({'get': 'searching'}), name='search product'),
+
+
+    path('products/<int:product_id>/min_price/',
+         ProductViewSet.as_view({'get': 'get_min_price_product'}), name='get_min_price_product'),
+    path('products/<int:product_id>/max_price/',
+         ProductViewSet.as_view({'get': 'get_max_price_product'}), name='get_max_price_product'),
+
+    path('products/categories/<int:category_id>/rating/<int:min_rating>/price/<int:min_price>/<int:max_price>/',
+         ProductViewSet.as_view({'get': 'get_category_products_rating_price'}),
+         name='get category products by rating and price'),
+    path('products/subcategories/<int:subcategory_id>/rating/<int:min_rating>/price/<int:min_price>/<int:max_price>/',
+         ProductViewSet.as_view({'get': 'get_subcategory_products_rating_price'}),
+         name='get subcategory products by rating and price'),
+
+    path('products/subcategories/<int:subcategory_id>/',
+         ProductViewSet.as_view({'get': 'get_subcategory_products'}),
+         name='get subcategory products '),
 
 ]
 

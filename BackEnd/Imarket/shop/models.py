@@ -48,5 +48,6 @@ class WarehouseItem(models.Model):
         verbose_name_plural = 'warehouse items'
 
     def __str__(self):
-        return f'whi_id: {self.pk}, product: {self.product.name}, shop: {self.shop.name}, ' \
-               f'price: {self.price}, quantity_in_wh: {self.quantity}'
+        return f'whi_id: {self.pk}, ---- product: {self.product.name}, ---- shop: {self.shop.name}, ' \
+               f'---- price: {self.price}, ---- quantity_in_wh: {self.quantity},' \
+               f' --- subcat_id: {self.product.subcategory_id}'

@@ -2,7 +2,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 
 from users.permissions import IsAdminOrReadOnly
-from shop.models import Shop
+from shop.models import Shop, WarehouseItem
 from .models import Category, Product, ProductImage, SubCategory
 from .serializers import ProductSerializer, CategorySerializer, ProductImageSerializer, SubCategorySerializer
 
@@ -42,12 +42,21 @@ class ProductViewSet(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
     permission_classes = (IsAdminOrReadOnly,)
 
+    def get_min_price_product(self, request, product_id):
+        warehouse_items = WarehouseItem.objects.filter(product_id=product_id)
+        min_prod = 1e9
+        for whi in warehouse_items:
+            min_prod = min(min_prod, whi.price)
+        return Response({"min_price": min_prod})
 
-    def get_min_product_price(self, product_id):
-        pass
 
-    def get_max_product_price(self, product_id):
-        pass
+    def get_max_price_product(self, request, product_id):
+        warehouse_items = WarehouseItem.objects.filter(product_id=product_id)
+        max_prod = -1e9
+        for whi in warehouse_items:
+            max_prod = max(max_prod, whi.price)
+        return Response({"min_price": max_prod})
+
     def get_category_products_rating_price(self,
                                            request,
                                            category_id,
@@ -55,16 +64,29 @@ class ProductViewSet(viewsets.ModelViewSet):
                                            min_price: int = 0,
                                            max_price: int = 1e9):
         subcategories = SubCategory.objects.filter(category_id=category_id)
-        products = Product.objects.filter(subcategory__in=subcategories)
+        products = Product.objects.filter(subcategory__in=subcategories).filter(rating__gte=min_rating)
+        warehouse_items = WarehouseItem.objects.filter(product__in=products).filter(price__range=(min_price, max_price))
+        products = [whi.product for whi in warehouse_items]
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data)
 
-    def get_category_subcategory_products_rating_price(self,
-                                                       request,
-                                                       category_id,
-                                                       subcategory_id,
-                                                       min_rating: int = 0,
-                                                       min_price: int = 0,
-                                                       max_price: int = 1e9):
-        pass
+    def get_subcategory_products_rating_price(self,
+                                              request,
+                                              subcategory_id,
+                                              min_rating: int = 0,
+                                              min_price: int = 0,
+                                              max_price: int = 1e9):
+        products = Product.objects.filter(subcategory_id=subcategory_id).filter(rating__gte=min_rating)
+        warehouse_items = WarehouseItem.objects.filter(product__in=products).filter(price__range=(min_price, max_price))
+        products = [whi.product for whi in warehouse_items]
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data)
+
+    def get_subcategory_products(self, request, subcategory_id):
+        print("----\n\nJEEE")
+        products = Product.objects.filter(subcategory_id=subcategory_id)
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data)
 
 
 
@@ -115,8 +137,3 @@ class ProductViewSet(viewsets.ModelViewSet):
         product.save()
         return Response(data=product.rating, status=status.HTTP_200_OK)
 
-    def get_subcategory_products(self, req, category_id, subcat_id):
-        queryset = Product.objects.all().filter(subcategory_id=subcat_id)
-        serializer = ProductSerializer(queryset, many=True)
-
-        return Response(serializer.data)

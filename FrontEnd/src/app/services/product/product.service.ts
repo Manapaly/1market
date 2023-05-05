@@ -51,11 +51,11 @@ export class ProductService {
 
 
 
-  getProductImages(product_id: number): Observable<ProductImages[]> {
-    return this.client.get<ProductImages[]> (
-      `${this.BASE_URL}/products/<int:product_id>/product_images/`
-    )
-  }
+  // getProductImages(product_id: number): Observable<ProductImages[]> {
+  //   return this.client.get<ProductImages[]> (
+  //     `${this.BASE_URL}/products/<int:product_id>/product_images/`
+  //   )
+  // }
   // path('products/<int:product_id>/product_images/',
   // ProductImageViewSet.as_view({'get': 'product_images_of_product'}), name='product images of product'),
 

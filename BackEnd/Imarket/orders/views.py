@@ -40,7 +40,7 @@ class OrderViewSet(viewsets.ModelViewSet):
 class OrderItemViewSet(viewsets.ModelViewSet):
     queryset = OrderItem.objects.all()
     serializer_class = OrderItemSerializer
-    permission_classes = (IsAdminOrReadOnly, IsCustomer)
+    # permission_classes = (IsAdminOrReadOnly, IsCustomer)
 
     def get_order_items_in_cart(self, request, user_id):
         last_order = get_last_order(user_id)
@@ -54,9 +54,11 @@ class OrderItemViewSet(viewsets.ModelViewSet):
         for ordered_dicts in serializer.data:
             product_in_cart = json.loads(json.dumps(ordered_dicts))
             whi = WarehouseItem.objects.get(id=product_in_cart['warehouse_item'])
-            # print("->", product_in_cart['quantity'])
+            # print("\n\n---->", product_in_cart)
             item = {
-                "name": whi.product.name,
+                "order_item_id": product_in_cart['id'],
+                "product_id": whi.product.id,
+                "product_name": whi.product.name,
                 "quantity": product_in_cart['quantity'],
                 "shop_name": whi.shop.name,
                 "priceInThisShop": whi.price,
@@ -75,7 +77,35 @@ class OrderItemViewSet(viewsets.ModelViewSet):
         # user_id = request.user.id # ? permissions
         queryset = OrderItem.objects.filter(order_id=order_id)
         serializer = OrderItemSerializer(queryset, many=True)
-        return Response(serializer.data)
+        products = []
+        # print(f"\n\n----{WarehouseItem.objects.get(id=(json.loads(json.dumps(serializer.data[0]))['warehouse_item']))}--\n\n")
+        for ordered_dicts in serializer.data:
+            product_in_cart = json.loads(json.dumps(ordered_dicts))
+            whi = WarehouseItem.objects.get(id=product_in_cart['warehouse_item'])
+            # print("\n\n---->", product_in_cart)
+            order = Order.objects.get(id=order_id)
+            # print(order)
+            item = {
+                "order_item_id": product_in_cart['id'],
+
+                "delivery_date": order.delivery_date,
+                "delivery_address": order.delivery_address,
+                "delivery_price": order.delivery_price,
+
+                "product_id": whi.product.id,
+                "product_name": whi.product.name,
+                "quantity": product_in_cart['quantity'],
+                "shop_name": whi.shop.name,
+                "priceInThisShop": whi.price,
+            }
+            products.append(item)
+        # print(products)
+        # return Response(serializer.data)
+        return Response(products)
+
+
+
+
 
     def delete_order_item_from_order(self, request, orderitem_id):  # aka: delete_orderitem_from_cart
         try:

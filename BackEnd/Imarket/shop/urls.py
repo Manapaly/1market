@@ -11,6 +11,9 @@ urlpatterns = [
          name='get warehouse items from shop'),
     path('shops/<int:shop_id>/put_rating/<int:new_rating>/',
          ShopViewSet.as_view({'get': 'put_rating_to_shop'}), name='rate shop'),
+    path('shops/<int:shop_id>/sold_products/',
+         WarehouseViewSet.as_view({'get': 'get_sold_products'}),
+         name='get sold items of this shop'),
 
 ]
 

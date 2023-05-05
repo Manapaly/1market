@@ -34,7 +34,7 @@ class Shop(models.Model):
         ordering = ('-rating', 'name')
 
     def __str__(self):
-        return f'{self.name} - rating: ({self.rating})'
+        return f'shop_id: {self.pk} --- {self.name} - rating: ({self.rating})'
 
 
 class WarehouseItem(models.Model):
@@ -48,6 +48,6 @@ class WarehouseItem(models.Model):
         verbose_name_plural = 'warehouse items'
 
     def __str__(self):
-        return f'whi_id: {self.pk}, ---- product: {self.product.name}, ---- shop: {self.shop.name}, ' \
+        return f'whi_id: {self.pk}, ---- shop: {self.shop.name}, ---- product: {self.product.name}, ' \
                f'---- price: {self.price}, ---- quantity_in_wh: {self.quantity},' \
                f' --- subcat_id: {self.product.subcategory_id}'

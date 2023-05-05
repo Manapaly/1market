@@ -5,6 +5,7 @@ import time
 from django.shortcuts import render
 from rest_framework.views import APIView
 
+from .models import User
 from .serializers import UserSerializer
 from django.core.mail import send_mail
 from django.views.decorators.csrf import csrf_exempt

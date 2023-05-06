@@ -53,7 +53,11 @@ class OrderItemViewSet(viewsets.ModelViewSet):
         # print(f"\n\n----{WarehouseItem.objects.get(id=(json.loads(json.dumps(serializer.data[0]))['warehouse_item']))}--\n\n")
         for ordered_dicts in serializer.data:
             product_in_cart = json.loads(json.dumps(ordered_dicts))
-            whi = WarehouseItem.objects.get(id=product_in_cart['warehouse_item'])
+            try:
+                whi = WarehouseItem.objects.get(id=product_in_cart['warehouse_item'])
+            except WarehouseItem.DoesNotExist as e:
+                return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+
             # print("\n\n---->", product_in_cart)
             item = {
                 "order_item_id": product_in_cart['id'],
@@ -81,7 +85,10 @@ class OrderItemViewSet(viewsets.ModelViewSet):
         # print(f"\n\n----{WarehouseItem.objects.get(id=(json.loads(json.dumps(serializer.data[0]))['warehouse_item']))}--\n\n")
         for ordered_dicts in serializer.data:
             product_in_cart = json.loads(json.dumps(ordered_dicts))
-            whi = WarehouseItem.objects.get(id=product_in_cart['warehouse_item'])
+            try:
+                whi = WarehouseItem.objects.get(id=product_in_cart['warehouse_item'])
+            except WarehouseItem.DoesNotExist as e:
+                return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
             # print("\n\n---->", product_in_cart)
             order = Order.objects.get(id=order_id)
             # print(order)
@@ -135,7 +142,10 @@ class OrderItemViewSet(viewsets.ModelViewSet):
             serializer.save()
 
             warehouse_item_id = serializer.data["warehouse_item"]
-            warehouse_item = WarehouseItem.objects.get(id=warehouse_item_id)
+            try:
+                warehouse_item = WarehouseItem.objects.get(id=warehouse_item_id)
+            except WarehouseItem.DoesNotExist as e:
+                return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
             order_item_quantity = serializer.data["quantity"]
 
             warehouse_item.quantity = warehouse_item.quantity - order_item_quantity

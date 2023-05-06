@@ -8,6 +8,7 @@ from users.permissions import IsOwnerOfShop, IsOwnerOfWarehouseItem, IsAdminOrRe
 from .models import Shop, WarehouseItem
 from .serializers import ShopSerializer, WarehouseItemSerializer
 import json
+from rest_framework.decorators import api_view
 
 class ShopViewSet(viewsets.ModelViewSet):
     queryset = Shop.objects.all()
@@ -15,19 +16,32 @@ class ShopViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrReadOnly, IsOwnerOfShop)
 
     def put_rating_to_shop(self, request, shop_id, new_rating):
-        shop = Shop.objects.get(id=shop_id)
+        try:
+            shop = Shop.objects.get(id=shop_id)
+        except Shop.DoesNotExist as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+
         shop.rate_cnt = shop.rate_cnt + 1
         shop.rating = (shop.rating + new_rating) / shop.rate_cnt
         shop.save()
         return Response(data=shop.rating, status=status.HTTP_200_OK)
 
     def put_rating_to_shop(self, request, shop_id, new_rating) -> Response:
-        shop = Shop.objects.get(id=shop_id)
+        try:
+            shop = Shop.objects.get(id=shop_id)
+        except Shop.DoesNotExist as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+
         shop.rate_cnt = shop.rate_cnt + 1
         shop.rating = (shop.rating + new_rating) / (shop.rate_cnt)
         shop.save()
         return Response(data=shop.rating, status=status.HTTP_200_OK)
 
+
+    def get_shop_info(self, request, user_id):
+        shops = Shop.objects.filter(seller_id=user_id)
+        serializer = ShopSerializer(shops, many=True)
+        return Response(serializer.data)
 
 
 class WarehouseViewSet(viewsets.ModelViewSet):
@@ -43,13 +57,11 @@ class WarehouseViewSet(viewsets.ModelViewSet):
     def get_warehouse_items_of_shop(self, request, shop_id):
         queryset = WarehouseItem.objects.filter(shop_id=shop_id)
         serializer = WarehouseItemSerializer(queryset, many=True)
-
         items = []
 
         for ordered_dicts in serializer.data:
             warehouse_item = json.loads(json.dumps(ordered_dicts))
             print("\n->", warehouse_item)
-
             item =  {
                 "warehouse_id": warehouse_item['id'],
                 "price": warehouse_item['price'],
@@ -59,8 +71,6 @@ class WarehouseViewSet(viewsets.ModelViewSet):
                 "shop_id": warehouse_item['shop'],
             }
             items.append(item)
-
-
         return Response(items)
 
 

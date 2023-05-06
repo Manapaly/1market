@@ -26,7 +26,7 @@ class SubCategory(models.Model):
     category = models.ForeignKey(to=Category, on_delete=models.CASCADE, related_name='subcategories')
 
     def __str__(self):
-        return f'subcat: {self.name} -> from cat: {self.category.name}'
+        return f'subcat {self.pk}: {self.name} -> from cat: {self.category.name}'
 
     class Meta:
         verbose_name = 'Subcategory'

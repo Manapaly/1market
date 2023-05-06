@@ -24,6 +24,8 @@ urlpatterns = [
 
 
 
+
+
     # searching
     path('products/searching/<str:query>/',
          ProductViewSet.as_view({'get': 'searching'}), name='search product'),
@@ -44,6 +46,16 @@ urlpatterns = [
     path('products/subcategories/<int:subcategory_id>/',
          ProductViewSet.as_view({'get': 'get_subcategory_products'}),
          name='get subcategory products '),
+
+
+
+    path('subcategories/<int:sabcategory_id>/name/',
+         ProductViewSet.as_view({'get': 'get_subcategory_name'}),
+         name='get subcategory name '),
+
+    path('products/<int:product_id>/get_avg/',
+         ProductViewSet.as_view({'get': 'get_avg_price'}),
+         name='get_avg_price'),
 
 ]
 

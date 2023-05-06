@@ -131,9 +131,31 @@ class ProductViewSet(viewsets.ModelViewSet):
         pass
 
     def put_rating_to_product(self, request, product_id, new_rating) -> Response:
-        product = Product.objects.get(id=product_id)
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
         product.rate_cnt = product.rate_cnt + 1
         product.rating = (product.rating + new_rating) / product.rate_cnt
         product.save()
         return Response(data=product.rating, status=status.HTTP_200_OK)
 
+
+
+    def get_subcategory_name(self, request, sabcategory_id):
+        try:
+            subcat = SubCategory.objects.get(id=sabcategory_id)
+        except SubCategory.DoesNotExist as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+        return Response({"subcat_name": subcat.name})
+
+    def get_avg_price(self, request, product_id):
+        whis = WarehouseItem.objects.filter(product_id=product_id)
+
+        sum = 0
+        cnt = 0
+        for i in whis:
+            sum += i.price
+            cnt += 1
+
+        return Response({"avg_price": sum // cnt})
